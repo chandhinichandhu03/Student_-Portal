@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Back Button -->
+<div class="mb-3">
+	<a href="{{ url_for('admin.admin_tests') }}" class="btn btn-outline-secondary">
+		<i class="fas fa-arrow-left me-2"></i>Back to Manage Tests
+	</a>
+</div>
+
+<h2 class="h4 mb-3">Edit Question</h2>
+<form method="post" class="card shadow p-4">
+	<div class="mb-3"><label class="form-label">Question</label><textarea class="form-control" name="question" rows="3" required>{{ q.question }}</textarea></div>
+	<div class="row g-3">
+		<div class="col-md-6"><label class="form-label">Option 1</label><input class="form-control" name="option1" value="{{ q.option1 }}" required></div>
+		<div class="col-md-6"><label class="form-label">Option 2</label><input class="form-control" name="option2" value="{{ q.option2 }}" required></div>
+		<div class="col-md-6"><label class="form-label">Option 3</label><input class="form-control" name="option3" value="{{ q.option3 }}" required></div>
+		<div class="col-md-6"><label class="form-label">Option 4</label><input class="form-control" name="option4" value="{{ q.option4 }}" required></div>
+		<div class="col-md-6"><label class="form-label">Correct Answer</label><input class="form-control" name="correct" value="{{ q.correct }}" required></div>
+	</div>
+	<button class="btn btn-primary mt-3">Save</button>
+</form>
+{% endblock %}

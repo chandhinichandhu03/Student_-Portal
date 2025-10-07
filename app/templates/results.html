@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Back Button -->
+<div class="mb-3">
+	<a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">
+		<i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+	</a>
+</div>
+
+<h2 class="h4 mb-3">Results & Analytics</h2>
+<div class="row g-3">
+	<div class="col-md-6">
+		<div class="card shadow-sm"><div class="card-body"><canvas id="resChart" height="160"></canvas></div></div>
+	</div>
+	<div class="col-md-6">
+		<div class="card shadow-sm"><div class="card-body">
+			<table class="table table-sm">
+				<thead><tr><th>Subject</th><th>Score</th><th>Date</th></tr></thead>
+				<tbody>
+					{% for r in items %}
+					<tr><td>{{ r.subject }}</td><td>{{ r.marks }}/{{ r.total }}</td><td>{{ r.timestamp.strftime('%Y-%m-%d') }}</td></tr>
+					{% else %}
+					<tr><td colspan="3">No results yet.</td></tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div></div>
+	</div>
+</div>
+<script>
+	(async function(){
+		const res = await fetch('/api/results');
+		const data = await res.json();
+		const labels = data.map(d => d.subject);
+		const pct = data.map(d => Math.round((d.score*100)/d.total));
+		new Chart(document.getElementById('resChart'), { type:'line', data:{ labels, datasets:[{label:'% Score', data:pct, borderColor:'#10b981'}] } });
+	})();
+</script>
+{% endblock %}

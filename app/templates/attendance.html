@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-12">
+			<!-- Back Button -->
+			<div class="mb-3">
+				<a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">
+					<i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+				</a>
+			</div>
+			
+			<div class="d-flex justify-content-between align-items-center mb-4">
+				<div>
+					<h1 class="h3 mb-1 text-gradient">📅 Attendance Tracker</h1>
+					<p class="text-muted mb-0">Mark your daily attendance and track your progress</p>
+				</div>
+				<div class="text-end">
+					<span class="badge bg-primary fs-6 px-3 py-2">
+						<i class="fas fa-calendar-check me-2"></i>{{ current_user.name }}
+					</span>
+				</div>
+			</div>
+
+			<!-- Attendance Summary Cards -->
+			<div class="row g-4 mb-4">
+				<div class="col-lg-3 col-md-6">
+					<div class="attendance-summary-card attendance-card-present">
+						<div class="summary-icon">
+							<i class="fas fa-check-circle"></i>
+						</div>
+						<div class="summary-content">
+							<h6 class="summary-label">Present Days</h6>
+							<h3 class="summary-value">{{ records|selectattr('status', 'equalto', 'present')|list|length }}</h3>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6">
+					<div class="attendance-summary-card attendance-card-absent">
+						<div class="summary-icon">
+							<i class="fas fa-times-circle"></i>
+						</div>
+						<div class="summary-content">
+							<h6 class="summary-label">Absent Days</h6>
+							<h3 class="summary-value">{{ records|selectattr('status', 'equalto', 'absent')|list|length }}</h3>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6">
+					<div class="attendance-summary-card attendance-card-leave">
+						<div class="summary-icon">
+							<i class="fas fa-calendar-times"></i>
+						</div>
+						<div class="summary-content">
+							<h6 class="summary-label">Leave Days</h6>
+							<h3 class="summary-value">{{ records|selectattr('status', 'equalto', 'leave')|list|length }}</h3>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6">
+					<div class="attendance-summary-card attendance-card-percentage">
+						<div class="summary-icon">
+							<i class="fas fa-percentage"></i>
+						</div>
+						<div class="summary-content">
+							<h6 class="summary-label">Attendance %</h6>
+							<h3 class="summary-value">
+								{% if records %}
+									{{ "%.1f"|format((records|selectattr('status', 'equalto', 'present')|list|length / records|length * 100)) }}%
+								{% else %}
+									0%
+								{% endif %}
+							</h3>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Mark Attendance Form -->
+			<div class="row g-4 mb-4">
+				<div class="col-12">
+					<div class="attendance-form-card">
+						<div class="attendance-form-header">
+							<div class="form-header-icon">
+								<i class="fas fa-edit"></i>
+							</div>
+							<div class="form-header-content">
+								<h5 class="mb-1">Mark Today's Attendance</h5>
+								<p class="mb-0 text-muted">Record your attendance for today</p>
+							</div>
+						</div>
+						<div class="attendance-form-content">
+							<form method="post" class="attendance-form">
+								<div class="row g-3 align-items-end">
+									<div class="col-md-3">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-user-check me-2"></i>Status
+											</label>
+											<select class="form-control" name="status" required>
+												<option value="present">✅ Present</option>
+												<option value="absent">❌ Absent</option>
+												<option value="leave">📝 Leave</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-7">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-comment me-2"></i>Remarks
+											</label>
+											<input type="text" class="form-control" name="remarks" 
+												placeholder="Optional remarks or reason...">
+										</div>
+									</div>
+									<div class="col-md-2">
+										<button type="submit" class="btn btn-primary btn-lg w-100">
+											<i class="fas fa-save me-2"></i>Mark Today
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Attendance Records -->
+			<div class="row g-4">
+				<div class="col-12">
+					<div class="attendance-records-card">
+						<div class="records-header">
+							<div class="records-title">
+								<h5 class="mb-1">Attendance History</h5>
+								<p class="mb-0 text-muted">Your daily attendance records</p>
+							</div>
+							<div class="records-actions">
+								<button class="btn btn-outline-primary btn-sm">
+									<i class="fas fa-download me-1"></i>Export
+								</button>
+							</div>
+						</div>
+						<div class="records-content">
+							{% if records %}
+							<div class="attendance-timeline">
+								{% for r in records|reverse %}
+								<div class="timeline-item">
+									<div class="timeline-marker">
+										<div class="marker-icon status-{{ r.status }}">
+											{% if r.status == 'present' %}
+												<i class="fas fa-check"></i>
+											{% elif r.status == 'absent' %}
+												<i class="fas fa-times"></i>
+											{% else %}
+												<i class="fas fa-calendar-times"></i>
+											{% endif %}
+										</div>
+									</div>
+									<div class="timeline-content">
+										<div class="timeline-header">
+											<h6 class="timeline-date">{{ r.date.strftime('%d %B %Y') }}</h6>
+											<span class="status-badge status-{{ r.status }}">
+												{{ r.status.title() }}
+											</span>
+										</div>
+										{% if r.remarks %}
+										<div class="timeline-remarks">
+											<i class="fas fa-comment me-2"></i>
+											<span>{{ r.remarks }}</span>
+										</div>
+										{% endif %}
+									</div>
+								</div>
+								{% endfor %}
+							</div>
+							{% else %}
+							<div class="empty-state">
+								<div class="empty-icon">
+									<i class="fas fa-calendar-check"></i>
+								</div>
+								<h6 class="text-muted">No attendance records</h6>
+								<p class="text-muted">Start marking your attendance to see your history</p>
+							</div>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Attendance Insights -->
+			{% if records %}
+			<div class="row g-4 mt-4">
+				<div class="col-12">
+					<div class="insights-card">
+						<div class="insights-header">
+							<h5 class="mb-1">Attendance Insights</h5>
+							<p class="mb-0 text-muted">Your attendance patterns and statistics</p>
+						</div>
+						<div class="insights-content">
+							<div class="row g-3">
+								<div class="col-md-4">
+									<div class="insight-item">
+										<div class="insight-icon">
+											<i class="fas fa-chart-line"></i>
+										</div>
+										<div class="insight-content">
+											<h6>Current Streak</h6>
+											<p class="insight-value">
+												{% set recent_records = records|reverse %}
+												{% set streak = 0 %}
+												{% set streak_calculated = false %}
+												{% for r in recent_records %}
+													{% if not streak_calculated %}
+														{% if r.status == 'present' %}
+															{% set streak = streak + 1 %}
+														{% else %}
+															{% set streak_calculated = true %}
+														{% endif %}
+													{% endif %}
+												{% endfor %}
+												{{ streak }} days
+											</p>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-4">
+									<div class="insight-item">
+										<div class="insight-icon">
+											<i class="fas fa-target"></i>
+										</div>
+										<div class="insight-content">
+											<h6>Target Achievement</h6>
+											<p class="insight-value">
+												{% set percentage = (records|selectattr('status', 'equalto', 'present')|list|length / records|length * 100) %}
+												{% if percentage >= 75 %}
+													<span class="text-success">✅ Above 75%</span>
+												{% else %}
+													<span class="text-warning">⚠️ Below 75%</span>
+												{% endif %}
+											</p>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-4">
+									<div class="insight-item">
+										<div class="insight-icon">
+											<i class="fas fa-calendar-alt"></i>
+										</div>
+										<div class="insight-content">
+											<h6>Total Days</h6>
+											<p class="insight-value">{{ records|length }} days</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+	</div>
+</div>
+{% endblock %}

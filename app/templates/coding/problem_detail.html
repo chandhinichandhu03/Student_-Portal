@@ -1,0 +1,472 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Back Button -->
+<div class="container-fluid mt-3">
+    <a href="{{ url_for('coding.problems') }}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Problems
+    </a>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Problem Description -->
+        <div class="col-lg-4">
+            <div class="sticky-top" style="top: 20px;">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-primary text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-puzzle-piece me-2"></i>
+                                {{ problem.title }}
+                            </h5>
+                            {% if problem.difficulty == 'easy' %}
+                                <span class="badge bg-success">Easy</span>
+                            {% elif problem.difficulty == 'medium' %}
+                                <span class="badge bg-warning">Medium</span>
+                            {% else %}
+                                <span class="badge bg-danger">Hard</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <div class="coding-stat">
+                                        <i class="fas fa-clock text-primary"></i>
+                                        <small class="d-block text-muted">{{ problem.time_limit }}s</small>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="coding-stat">
+                                        <i class="fas fa-memory text-info"></i>
+                                        <small class="d-block text-muted">{{ problem.memory_limit }}MB</small>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="coding-stat">
+                                        <i class="fas fa-list text-success"></i>
+                                        <small class="d-block text-muted">{{ problem.test_cases|length }} tests</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="problem-description">
+                            {{ problem.description|replace('**','')|replace('*','')|replace('\n', '<br>')|safe }}
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h6 class="fw-bold">Test Cases:</h6>
+                            {% for test_case in problem.test_cases[:3] %}
+                            <div class="test-case-preview mb-3">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <strong>Input:</strong>
+                                        <pre class="bg-light p-2 rounded small">{{ test_case.input_data }}</pre>
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>Expected Output:</strong>
+                                        <pre class="bg-light p-2 rounded small">{{ test_case.expected_output }}</pre>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% if problem.test_cases|length > 3 %}
+                            <p class="text-muted small">
+                                <i class="fas fa-info-circle me-1"></i>
+                                {{ problem.test_cases|length - 3 }} more test cases will be evaluated
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Code Editor -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-code me-2"></i>
+                            Code Editor
+                        </h5>
+                        <div class="d-flex gap-2">
+                            <select class="form-select form-select-sm" id="languageSelect">
+                                <option value="python">Python</option>
+                                <option value="java">Java</option>
+                                <option value="cpp">C++</option>
+                                <option value="c">C</option>
+                                <option value="javascript">JavaScript</option>
+                            </select>
+                            <button class="btn btn-success btn-sm" onclick="runCode()">
+                                <i class="fas fa-play me-1"></i>Run
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div id="editor" style="height: 400px;"></div>
+                </div>
+            </div>
+            
+            <!-- Output Panel -->
+            <div class="card shadow-sm border-0 mt-3">
+                <div class="card-header bg-secondary text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-terminal me-2"></i>
+                        Output
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div id="output" class="output-panel">
+                        <div class="text-muted text-center py-4">
+                            <i class="fas fa-play-circle fa-2x mb-2"></i>
+                            <p>Click "Run" to execute your code</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Submissions -->
+    {% if submissions %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-history me-2"></i>
+                        Recent Submissions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Language</th>
+                                    <th>Status</th>
+                                    <th>Score</th>
+                                    <th>Time</th>
+                                    <th>Memory</th>
+                                    <th>Submitted</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for submission in submissions %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-info">{{ submission.language|upper }}</span>
+                                    </td>
+                                    <td>
+                                        {% if submission.status == 'accepted' %}
+                                            <span class="badge bg-success">Accepted</span>
+                                        {% elif submission.status == 'wrong_answer' %}
+                                            <span class="badge bg-warning">Wrong Answer</span>
+                                        {% elif submission.status == 'time_limit_exceeded' %}
+                                            <span class="badge bg-danger">Time Limit</span>
+                                        {% elif submission.status == 'runtime_error' %}
+                                            <span class="badge bg-danger">Runtime Error</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ submission.status|title }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ submission.score }}/{{ submission.total_test_cases * 10 }}</td>
+                                    <td>{{ "%.2f"|format(submission.execution_time or 0) }}s</td>
+                                    <td>{{ "%.1f"|format(submission.memory_used or 0) }}MB</td>
+                                    <td>{{ submission.submitted_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Code Templates -->
+<script>
+const codeTemplates = {
+    python: `def solution():
+    # Write your code here
+    pass
+
+# Test your solution
+if __name__ == "__main__":
+    result = solution()
+    print(result)`,
+    
+    java: `public class Solution {
+    public static void main(String[] args) {
+        // Write your code here
+        System.out.println("Hello World");
+    }
+}`,
+    
+    cpp: `#include <iostream>
+using namespace std;
+
+int main() {
+    // Write your code here
+    cout << "Hello World" << endl;
+    return 0;
+}`,
+    
+    c: `#include <stdio.h>
+
+int main() {
+    // Write your code here
+    printf("Hello World\\n");
+    return 0;
+}`,
+    
+    javascript: `function solution() {
+    // Write your code here
+    return "Hello World";
+}
+
+// Test your solution
+console.log(solution());`
+};
+</script>
+
+<!-- Monaco Editor -->
+<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
+
+<style>
+.coding-stat {
+    padding: 8px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.05);
+    text-align: center;
+}
+
+.problem-description {
+    line-height: 1.6;
+    color: #333;
+}
+
+.test-case-preview pre {
+    font-size: 0.8rem;
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.output-panel {
+    min-height: 150px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+.test-result {
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    border-left: 4px solid;
+}
+
+.test-result.passed {
+    background: #d4edda;
+    border-color: #28a745;
+    color: #155724;
+}
+
+.test-result.failed {
+    background: #f8d7da;
+    border-color: #dc3545;
+    color: #721c24;
+}
+
+.loading {
+    display: none;
+    text-align: center;
+    padding: 20px;
+}
+
+.loading.show {
+    display: block;
+}
+</style>
+
+<script>
+let editor;
+
+// Initialize Monaco Editor
+require.config({ paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs' }});
+require(['vs/editor/editor.main'], function () {
+    const storageKey = `code_problem_{{ problem.id }}`;
+    const saved = localStorage.getItem(storageKey);
+    editor = monaco.editor.create(document.getElementById('editor'), {
+        value: saved || codeTemplates.python,
+        language: 'python',
+        theme: 'vs-dark',
+        automaticLayout: true,
+        minimap: { enabled: false },
+        fontSize: 14,
+        lineNumbers: 'on',
+        roundedSelection: false,
+        scrollBeyondLastLine: false,
+        readOnly: false,
+        cursorStyle: 'line'
+    });
+});
+
+// Language change handler
+document.getElementById('languageSelect').addEventListener('change', function() {
+    const language = this.value;
+    const existing = editor.getValue();
+    const isDefault = Object.values(codeTemplates).includes(existing);
+    const template = isDefault ? codeTemplates[language] : existing;
+    if (editor) {
+        editor.setValue(template);
+        monaco.editor.setModelLanguage(editor.getModel(), language);
+    }
+});
+
+// Run code function
+async function runCode() {
+    const code = editor.getValue();
+    const language = document.getElementById('languageSelect').value;
+    const outputDiv = document.getElementById('output');
+    const storageKey = `code_problem_{{ problem.id }}`;
+    localStorage.setItem(storageKey, code);
+    
+    // Show loading
+    outputDiv.innerHTML = `
+        <div class="loading show">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Running...</span>
+            </div>
+            <p class="mt-2">Executing your code...</p>
+        </div>
+    `;
+    
+    try {
+        const response = await fetch(`{{ url_for('coding.submit_solution', problem_id=problem.id) }}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                code: code,
+                language: language
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            displayResults(result);
+        } else {
+            outputDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Error: ${result.error}
+                </div>
+            `;
+        }
+    } catch (error) {
+        outputDiv.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Network error: ${error.message}
+            </div>
+        `;
+    }
+}
+
+function displayResults(result) {
+    const outputDiv = document.getElementById('output');
+    let html = '';
+    
+    // Overall status
+    const statusClass = result.status === 'accepted' ? 'success' : 'danger';
+    const statusIcon = result.status === 'accepted' ? 'check-circle' : 'times-circle';
+    
+    html += `
+        <div class="alert alert-${statusClass} mb-3">
+            <i class="fas fa-${statusIcon} me-2"></i>
+            <strong>${result.status.toUpperCase()}</strong> - 
+            ${result.passed_test_cases}/${result.total_test_cases} test cases passed
+            <span class="float-end">Score: ${result.score}</span>
+        </div>
+    `;
+    
+    // Execution stats
+    html += `
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <div class="text-center">
+                    <i class="fas fa-clock text-primary"></i>
+                    <div class="small">Execution Time</div>
+                    <strong>${result.execution_time.toFixed(2)}s</strong>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <i class="fas fa-memory text-info"></i>
+                    <div class="small">Memory Used</div>
+                    <strong>${result.memory_used.toFixed(1)}MB</strong>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <i class="fas fa-trophy text-warning"></i>
+                    <div class="small">Score</div>
+                    <strong>${result.score}</strong>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Test case results
+    if (result.test_results && result.test_results.length > 0) {
+        html += '<h6>Test Case Results:</h6>';
+        result.test_results.forEach((test, index) => {
+            const resultClass = test.passed ? 'passed' : 'failed';
+            const icon = test.passed ? 'check' : 'times';
+            
+            html += `
+                <div class="test-result ${resultClass}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>
+                            <i class="fas fa-${icon} me-2"></i>
+                            Test Case ${test.test_case_id}
+                        </span>
+                        <span class="badge bg-${test.passed ? 'success' : 'danger'}">
+                            ${test.points} pts
+                        </span>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <strong>Expected:</strong>
+                            <pre class="small mt-1">${test.expected_output}</pre>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Your Output:</strong>
+                            <pre class="small mt-1">${test.actual_output || 'No output'}</pre>
+                        </div>
+                    </div>
+                    ${test.error_message ? `<div class="text-danger small mt-2">Error: ${test.error_message}</div>` : ''}
+                </div>
+            `;
+        });
+    }
+    
+    outputDiv.innerHTML = html;
+    
+    // Keep the editor content and output on the page, do not reload
+}
+</script>
+{% endblock %}

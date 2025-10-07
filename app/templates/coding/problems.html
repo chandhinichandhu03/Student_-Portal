@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Back Button -->
+<div class="container mt-3">
+    <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+    </a>
+</div>
+
+<div class="coding-hero">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-4 fw-bold text-white mb-4">
+                    <i class="fas fa-code me-3"></i>
+                    Coding Problems
+                </h1>
+                <p class="lead text-white-50 mb-4">
+                    Practice coding with AI-generated problems. Solve challenges in Python, Java, C++, C, and JavaScript.
+                </p>
+                <div class="d-flex justify-content-center gap-3">
+                    <span class="badge bg-primary fs-6 px-3 py-2">
+                        <i class="fas fa-laptop-code me-2"></i>Multi-Language Support
+                    </span>
+                    <span class="badge bg-success fs-6 px-3 py-2">
+                        <i class="fas fa-robot me-2"></i>AI-Generated Problems
+                    </span>
+                    <span class="badge bg-warning fs-6 px-3 py-2">
+                        <i class="fas fa-tachometer-alt me-2"></i>Real-time Execution
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <!-- Filter Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Difficulty</label>
+                            <select class="form-select" id="difficultyFilter">
+                                <option value="">All Difficulties</option>
+                                <option value="easy">Easy</option>
+                                <option value="medium">Medium</option>
+                                <option value="hard">Hard</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Category</label>
+                            <select class="form-select" id="categoryFilter">
+                                <option value="">All Categories</option>
+                                <option value="algorithms">Algorithms</option>
+                                <option value="data-structures">Data Structures</option>
+                                <option value="mathematics">Mathematics</option>
+                                <option value="strings">Strings</option>
+                                <option value="arrays">Arrays</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Search</label>
+                            <input type="text" class="form-control" id="searchInput" placeholder="Search problems...">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button class="btn btn-primary w-100" onclick="applyFilters()">
+                                <i class="fas fa-search me-2"></i>Filter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Problems Grid -->
+    <div class="row" id="problemsGrid">
+        {% for problem in problems %}
+        <div class="col-lg-6 col-xl-4 mb-4 problem-card" 
+             data-difficulty="{{ problem.difficulty }}" 
+             data-category="{{ problem.category }}"
+             data-title="{{ problem.title.lower() }}">
+            <div class="card h-100 shadow-sm border-0 coding-problem-card">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="flex-grow-1">
+                            <h5 class="card-title fw-bold mb-1">
+                                <a href="{{ url_for('coding.view_problem', problem_id=problem.id) }}" 
+                                   class="text-decoration-none text-dark">
+                                    {{ problem.title }}
+                                </a>
+                            </h5>
+                            <p class="text-muted small mb-2">{{ problem.category|title }}</p>
+                        </div>
+                        <div class="text-end">
+                            {% if problem.difficulty == 'easy' %}
+                                <span class="badge bg-success">Easy</span>
+                            {% elif problem.difficulty == 'medium' %}
+                                <span class="badge bg-warning">Medium</span>
+                            {% else %}
+                                <span class="badge bg-danger">Hard</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <p class="card-text text-muted flex-grow-1">
+                        {{ problem.description[:150] }}{% if problem.description|length > 150 %}...{% endif %}
+                    </p>
+                    
+                    <div class="mt-auto">
+                        <div class="row text-center mb-3">
+                            <div class="col-4">
+                                <div class="coding-stat">
+                                    <i class="fas fa-clock text-primary"></i>
+                                    <small class="d-block text-muted">{{ problem.time_limit }}s</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="coding-stat">
+                                    <i class="fas fa-memory text-info"></i>
+                                    <small class="d-block text-muted">{{ problem.memory_limit }}MB</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="coding-stat">
+                                    <i class="fas fa-list text-success"></i>
+                                    <small class="d-block text-muted">{{ problem.test_cases|length }} tests</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <a href="{{ url_for('coding.view_problem', problem_id=problem.id) }}" 
+                               class="btn btn-primary">
+                                <i class="fas fa-play me-2"></i>Solve Problem
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if not problems %}
+    <div class="text-center py-5">
+        <div class="empty-state">
+            <i class="fas fa-code fa-4x text-muted mb-4"></i>
+            <h3 class="text-muted">No Coding Problems Available</h3>
+            <p class="text-muted">Check back later for new coding challenges!</p>
+            {% if current_user.role in ('admin', 'teacher') %}
+            <a href="{{ url_for('coding.create_coding_problem') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Create First Problem
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.coding-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 80px 0;
+    margin-bottom: 0;
+}
+
+.coding-problem-card {
+    transition: all 0.3s ease;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.coding-problem-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+}
+
+.coding-stat {
+    padding: 8px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.05);
+}
+
+.empty-state {
+    padding: 60px 20px;
+}
+
+.problem-card {
+    transition: all 0.3s ease;
+}
+
+.problem-card.hidden {
+    display: none;
+}
+</style>
+
+<script>
+function applyFilters() {
+    const difficulty = document.getElementById('difficultyFilter').value;
+    const category = document.getElementById('categoryFilter').value;
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    
+    const cards = document.querySelectorAll('.problem-card');
+    
+    cards.forEach(card => {
+        const cardDifficulty = card.dataset.difficulty;
+        const cardCategory = card.dataset.category;
+        const cardTitle = card.dataset.title;
+        
+        let show = true;
+        
+        if (difficulty && cardDifficulty !== difficulty) show = false;
+        if (category && cardCategory !== category) show = false;
+        if (search && !cardTitle.includes(search)) show = false;
+        
+        if (show) {
+            card.classList.remove('hidden');
+        } else {
+            card.classList.add('hidden');
+        }
+    });
+}
+
+// Auto-filter on input
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+document.getElementById('difficultyFilter').addEventListener('change', applyFilters);
+document.getElementById('categoryFilter').addEventListener('change', applyFilters);
+</script>
+{% endblock %}

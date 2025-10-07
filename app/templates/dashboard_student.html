@@ -1,0 +1,319 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-12">
+			<!-- Back Button -->
+			<div class="mb-3">
+				<a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">
+					<i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+				</a>
+			</div>
+			
+			<!-- Hero Section -->
+			<div class="dashboard-hero">
+				<div class="dashboard-hero-content">
+					<h1>Welcome back, {{ current_user.name }}!</h1>
+					<p>Track your academic progress and stay on top of your studies</p>
+				</div>
+			</div>
+
+			<!-- Quick Stats -->
+			<div class="dashboard-stats">
+				<div class="stat-card">
+					<div class="stat-icon primary">
+						<i class="fas fa-clipboard-list"></i>
+					</div>
+					<div class="stat-value">{{ past_results|length }}</div>
+					<div class="stat-label">Tests Taken</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-icon success">
+						<i class="fas fa-trophy"></i>
+					</div>
+					<div class="stat-value">
+						{% if past_results %}
+							{{ "%.1f"|format((past_results|map(attribute='marks')|sum / past_results|map(attribute='total')|sum * 100)) }}%
+						{% else %}
+							0%
+						{% endif %}
+					</div>
+					<div class="stat-label">Average Score</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-icon warning">
+						<i class="fas fa-calendar-check"></i>
+					</div>
+					<div class="stat-value">{{ upcoming_tests|length }}</div>
+					<div class="stat-label">Upcoming Tests</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-icon info">
+						<i class="fas fa-chart-line"></i>
+					</div>
+					<div class="stat-value">
+						{% if past_results %}
+							{{ past_results|map(attribute='marks')|max }}
+						{% else %}
+							0
+						{% endif %}
+					</div>
+					<div class="stat-label">Best Score</div>
+				</div>
+			</div>
+
+			<!-- Quick Stats Cards -->
+			<div class="row g-4 mb-4">
+				<div class="col-lg-3 col-md-6">
+					<div class="stats-card stats-card-primary">
+						<div class="stats-card-icon">
+							<i class="fas fa-clipboard-list"></i>
+						</div>
+						<div class="stats-card-content">
+							<h6 class="stats-card-label">Tests Taken</h6>
+							<h3 class="stats-card-value">{{ past_results|length }}</h3>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6">
+					<div class="stats-card stats-card-success">
+						<div class="stats-card-icon">
+							<i class="fas fa-trophy"></i>
+						</div>
+						<div class="stats-card-content">
+							<h6 class="stats-card-label">Average Score</h6>
+							<h3 class="stats-card-value">
+								{% if past_results %}
+									{{ "%.1f"|format((past_results|map(attribute='marks')|sum / past_results|map(attribute='total')|sum * 100)) }}%
+								{% else %}
+									0%
+								{% endif %}
+							</h3>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6">
+					<div class="stats-card stats-card-warning">
+						<div class="stats-card-icon">
+							<i class="fas fa-calendar-check"></i>
+						</div>
+						<div class="stats-card-content">
+							<h6 class="stats-card-label">Upcoming Tests</h6>
+							<h3 class="stats-card-value">{{ upcoming_tests|length }}</h3>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6">
+					<div class="stats-card stats-card-info">
+						<div class="stats-card-icon">
+							<i class="fas fa-chart-line"></i>
+						</div>
+						<div class="stats-card-content">
+							<h6 class="stats-card-label">Performance</h6>
+							<h3 class="stats-card-value">
+								{% if past_results %}
+									{% set avg_score = (past_results|map(attribute='marks')|sum / past_results|map(attribute='total')|sum * 100) %}
+									{% if avg_score >= 80 %}Excellent{% elif avg_score >= 60 %}Good{% else %}Needs Improvement{% endif %}
+								{% else %}
+									No Data
+								{% endif %}
+							</h3>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Main Content -->
+			<div class="row g-4">
+				<!-- Upcoming Tests -->
+				<div class="col-lg-4">
+					<div class="dashboard-card">
+						<div class="dashboard-card-header">
+							<div class="dashboard-card-title">
+								<h5 class="mb-1">Upcoming Tests</h5>
+								<p class="mb-0 text-muted">Tests you can take now</p>
+							</div>
+							<div class="dashboard-card-icon">
+								<i class="fas fa-clipboard-list"></i>
+							</div>
+						</div>
+						<div class="dashboard-card-content">
+							{% if upcoming_tests %}
+							<div class="test-list">
+								{% for t in upcoming_tests %}
+								<div class="test-item">
+									<div class="test-item-icon">
+										<i class="fas fa-file-alt"></i>
+									</div>
+									<div class="test-item-details">
+										<h6 class="test-subject">{{ t.subject }}</h6>
+										<div class="test-meta">
+											<span class="test-marks">{{ t.total_marks }} marks</span>
+											{% if t.time_limit_minutes %}
+											<span class="test-time">{{ t.time_limit_minutes }} min</span>
+											{% endif %}
+										</div>
+									</div>
+									<div class="test-item-actions">
+										<a href="/take_test/{{ t.id }}" class="btn btn-test btn-primary">
+											<i class="fas fa-play me-1"></i>Start
+										</a>
+									</div>
+								</div>
+								{% endfor %}
+							</div>
+							{% else %}
+							<div class="empty-state">
+								<div class="empty-icon">
+									<i class="fas fa-clipboard-list"></i>
+								</div>
+								<h6 class="text-muted">No tests available</h6>
+								<p class="text-muted">Check back later for new tests</p>
+							</div>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+
+				<!-- Recent Results & Performance Chart -->
+				<div class="col-lg-8">
+					<div class="dashboard-card">
+						<div class="dashboard-card-header">
+							<div class="dashboard-card-title">
+								<h5 class="mb-1">Performance Analytics</h5>
+								<p class="mb-0 text-muted">Your test results and progress</p>
+							</div>
+							<div class="dashboard-card-icon">
+								<i class="fas fa-chart-bar"></i>
+							</div>
+						</div>
+						<div class="dashboard-card-content">
+							{% if past_results %}
+							<div class="performance-chart mb-4">
+								<canvas id="perfChart" height="100"></canvas>
+							</div>
+							<div class="results-table">
+								<div class="table-header">
+									<h6 class="mb-0">Recent Results</h6>
+									<a href="/results" class="btn btn-sm btn-outline-primary">View All</a>
+								</div>
+								<div class="table-responsive">
+									<table class="table table-hover">
+										<thead>
+											<tr>
+												<th>Subject</th>
+												<th>Score</th>
+												<th>Percentage</th>
+												<th>Date</th>
+											</tr>
+										</thead>
+										<tbody>
+											{% for r in past_results[:5] %}
+											<tr>
+												<td>
+													<div class="subject-info">
+														<i class="fas fa-file-alt me-2"></i>
+														{{ r.subject }}
+													</div>
+												</td>
+												<td>
+													<span class="score-badge">{{ r.marks }}/{{ r.total }}</span>
+												</td>
+												<td>
+													{% set percentage = (r.marks / r.total * 100) %}
+													<div class="percentage-bar">
+														<div class="percentage-fill" style="width: {{ percentage }}%"></div>
+														<span class="percentage-text">{{ "%.1f"|format(percentage) }}%</span>
+													</div>
+												</td>
+												<td>
+													<span class="date-badge">{{ r.timestamp.strftime('%d %b %Y') }}</span>
+												</td>
+											</tr>
+											{% endfor %}
+										</tbody>
+									</table>
+								</div>
+							</div>
+							{% else %}
+							<div class="empty-state">
+								<div class="empty-icon">
+									<i class="fas fa-chart-line"></i>
+								</div>
+								<h6 class="text-muted">No results yet</h6>
+								<p class="text-muted">Take your first test to see performance analytics</p>
+								<a href="/tests" class="btn btn-primary mt-3">
+									<i class="fas fa-clipboard-list me-2"></i>Browse Tests
+								</a>
+							</div>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Quick Actions -->
+			<div class="row g-4 mt-4">
+				<div class="col-12">
+					<div class="quick-actions-card">
+						<div class="quick-actions-header">
+							<h5 class="mb-1">Quick Actions</h5>
+							<p class="mb-0 text-muted">Access frequently used features</p>
+						</div>
+						<div class="quick-actions-grid">
+							<a href="/tests" class="quick-action-item">
+								<div class="quick-action-icon">
+									<i class="fas fa-clipboard-list"></i>
+								</div>
+								<div class="quick-action-content">
+									<h6>Browse Tests</h6>
+									<p>Take available tests</p>
+								</div>
+							</a>
+							<a href="/results" class="quick-action-item">
+								<div class="quick-action-icon">
+									<i class="fas fa-chart-line"></i>
+								</div>
+								<div class="quick-action-content">
+									<h6>View Results</h6>
+									<p>Check your performance</p>
+								</div>
+							</a>
+							<a href="/attendance" class="quick-action-item">
+								<div class="quick-action-icon">
+									<i class="fas fa-calendar-check"></i>
+								</div>
+								<div class="quick-action-content">
+									<h6>Attendance</h6>
+									<p>Track your attendance</p>
+								</div>
+							</a>
+							<a href="/fees" class="quick-action-item">
+								<div class="quick-action-icon">
+									<i class="fas fa-credit-card"></i>
+								</div>
+								<div class="quick-action-content">
+									<h6>Fees</h6>
+									<p>Manage payments</p>
+								</div>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	// Placeholder chart init (data could be fetched via /api/results)
+	(async function(){
+		try {
+			const res = await fetch('/api/results');
+			const data = await res.json();
+			const labels = data.map(d => d.subject);
+			const scores = data.map(d => Math.round((d.score*100)/d.total));
+			new Chart(document.getElementById('perfChart'), { type: 'bar', data: { labels, datasets: [{ label: 'Percentage', data: scores, backgroundColor: '#3b82f6' }] } });
+		} catch(e){}
+	})();
+</script>
+{% endblock %}

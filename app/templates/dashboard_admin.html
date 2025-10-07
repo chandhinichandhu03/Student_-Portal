@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-12">
+			<!-- Back Button -->
+			<div class="mb-3">
+				<a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">
+					<i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+				</a>
+			</div>
+			
+			<!-- Hero Section -->
+			<div class="dashboard-hero">
+				<div class="dashboard-hero-content">
+					<h1>Admin Dashboard</h1>
+					<p>Manage students, tests, and monitor academic performance</p>
+				</div>
+			</div>
+
+			<!-- Quick Stats -->
+			<div class="dashboard-stats">
+				<div class="stat-card">
+					<div class="stat-icon primary">
+						<i class="fas fa-users"></i>
+					</div>
+					<div class="stat-value">{{ students_count }}</div>
+					<div class="stat-label">Total Students</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-icon success">
+						<i class="fas fa-clipboard-list"></i>
+					</div>
+					<div class="stat-value">{{ tests_count }}</div>
+					<div class="stat-label">Tests Created</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-icon warning">
+						<i class="fas fa-chart-bar"></i>
+					</div>
+					<div class="stat-value">{{ results_recent|length }}</div>
+					<div class="stat-label">Recent Submissions</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-icon info">
+						<i class="fas fa-calendar-alt"></i>
+					</div>
+					<div class="stat-value">Today</div>
+					<div class="stat-label">Active Sessions</div>
+				</div>
+			</div>
+
+			<!-- Dashboard Content -->
+			<div class="dashboard-content">
+				<!-- Recent Results -->
+				<div class="dashboard-card">
+					<div class="dashboard-card-header">
+						<h3 class="dashboard-card-title">
+							<i class="fas fa-chart-line"></i>
+							Recent Test Results
+						</h3>
+					</div>
+					<div class="table-responsive">
+						<table class="table table-hover">
+							<thead>
+								<tr>
+									<th>Student</th>
+									<th>Subject</th>
+									<th>Score</th>
+									<th>Date</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for r in results_recent %}
+								<tr>
+									<td>
+										<div class="d-flex align-items-center">
+											<div class="avatar-sm me-2">
+												<i class="fas fa-user-circle text-primary"></i>
+											</div>
+											{{ r.user.name }}
+										</div>
+									</td>
+									<td>{{ r.subject }}</td>
+									<td>
+										<span class="badge bg-{{ 'success' if (r.marks/r.total*100) >= 70 else 'warning' if (r.marks/r.total*100) >= 50 else 'danger' }}">
+											{{ r.marks }}/{{ r.total }}
+										</span>
+									</td>
+									<td>{{ r.timestamp.strftime('%Y-%m-%d') }}</td>
+								</tr>
+								{% else %}
+								<tr>
+									<td colspan="4" class="text-center text-muted py-4">
+										<i class="fas fa-inbox fa-2x mb-2"></i><br>
+										No recent results
+									</td>
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+				<!-- Quick Actions -->
+				<div class="dashboard-card">
+					<div class="dashboard-card-header">
+						<h3 class="dashboard-card-title">
+							<i class="fas fa-bolt"></i>
+							Quick Actions
+						</h3>
+					</div>
+					<div class="quick-actions">
+						<a href="{{ url_for('tests.generate_test') }}" class="quick-action-btn">
+							<div class="quick-action-icon">
+								<i class="fas fa-plus"></i>
+							</div>
+							<div>
+								<div class="fw-bold">Create Test</div>
+								<small class="text-muted">Generate AI-powered tests</small>
+							</div>
+						</a>
+						<a href="{{ url_for('admin.admin_tests') }}" class="quick-action-btn">
+							<div class="quick-action-icon">
+								<i class="fas fa-cog"></i>
+							</div>
+							<div>
+								<div class="fw-bold">Manage Tests</div>
+								<small class="text-muted">View and edit tests</small>
+							</div>
+						</a>
+						<a href="{{ url_for('admin.admin_leaves') }}" class="quick-action-btn">
+							<div class="quick-action-icon">
+								<i class="fas fa-calendar-times"></i>
+							</div>
+							<div>
+								<div class="fw-bold">Leave Requests</div>
+								<small class="text-muted">Review leave applications</small>
+							</div>
+						</a>
+						<a href="{{ url_for('admin.fee_structure') }}" class="quick-action-btn">
+							<div class="quick-action-icon">
+								<i class="fas fa-dollar-sign"></i>
+							</div>
+							<div>
+								<div class="fw-bold">Fee Structure</div>
+								<small class="text-muted">Manage fee settings</small>
+							</div>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

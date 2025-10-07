@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="auth-container">
+	<div class="auth-card" style="max-width: 600px;">
+		<div class="auth-header">
+			<div class="auth-logo">
+				<i class="fas fa-user-plus"></i>
+			</div>
+			<h1 class="auth-title">Join Our Portal</h1>
+			<p class="auth-subtitle">Create your student account</p>
+		</div>
+		
+		<form method="post" class="auth-form">
+			<div class="row g-3">
+				<div class="col-md-6">
+					<div class="form-floating">
+						<input type="text" class="form-control" id="name" name="name" placeholder="Full Name" required>
+						<label for="name">
+							<i class="fas fa-user me-2"></i>Full Name
+						</label>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="form-floating">
+						<input type="email" class="form-control" id="email" name="email" placeholder="Email Address" required>
+						<label for="email">
+							<i class="fas fa-envelope me-2"></i>Email Address
+						</label>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="form-floating">
+						<select class="form-control" id="department" name="department" required>
+							<option value="">Select Department</option>
+							<option value="Computer Science">Computer Science</option>
+							<option value="Electronics">Electronics</option>
+							<option value="Mechanical">Mechanical</option>
+							<option value="Civil">Civil</option>
+							<option value="Electrical">Electrical</option>
+							<option value="Information Technology">Information Technology</option>
+							<option value="AIML">Artificial Intelligence & Machine Learning</option>
+							<option value="AIDS">Artificial Intelligence & Data Science</option>
+							<option value="IoT">Internet of Things</option>
+							<option value="Aeronautical">Aeronautical Engineering</option>
+							<option value="Biomedical">Biomedical Engineering</option>
+							<option value="AIoT">Artificial Intelligence of Things</option>
+							<option value="Food Technology">Food Technology</option>
+							<option value="Mechatronics">Mechatronics</option>
+							<option value="Automobile">Automobile Engineering</option>
+							<option value="Chemical">Chemical Engineering</option>
+							<option value="Biotechnology">Biotechnology</option>
+							<option value="Aerospace">Aerospace Engineering</option>
+							<option value="Robotics">Robotics Engineering</option>
+							<option value="Cyber Security">Cyber Security</option>
+							<option value="Cloud Computing">Cloud Computing</option>
+							<option value="Blockchain">Blockchain Technology</option>
+						</select>
+						<label for="department">
+							<i class="fas fa-building me-2"></i>Department
+						</label>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="form-floating">
+						<input type="text" class="form-control" id="roll_number" name="roll_number" placeholder="Roll Number" required>
+						<label for="roll_number">
+							<i class="fas fa-id-card me-2"></i>Roll Number
+						</label>
+					</div>
+				</div>
+				<div class="col-12">
+					<div class="form-floating">
+						<input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+						<label for="password">
+							<i class="fas fa-lock me-2"></i>Password
+						</label>
+					</div>
+				</div>
+			</div>
+			
+			<button type="submit" class="auth-btn mt-3">
+				<i class="fas fa-user-plus me-2"></i>Create Account
+			</button>
+		</form>
+		
+		<div class="auth-links">
+			<p class="mb-0">Already have an account? <a href="{{ url_for('auth.login') }}">Sign in here</a></p>
+		</div>
+	</div>
+</div>
+{% endblock %}

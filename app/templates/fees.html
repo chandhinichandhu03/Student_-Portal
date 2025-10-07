@@ -1,0 +1,316 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-12">
+			<!-- Back Button -->
+			<div class="mb-3">
+				<a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">
+					<i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+				</a>
+			</div>
+			
+			<div class="d-flex justify-content-between align-items-center mb-4">
+				<div>
+					<h1 class="h3 mb-1 text-gradient">💰 Fee Management</h1>
+					<p class="text-muted mb-0">Manage your academic fees and payments</p>
+				</div>
+				<div class="text-end">
+					<span class="badge bg-primary fs-6 px-3 py-2">
+						<i class="fas fa-user-graduate me-2"></i>{{ current_user.name }}
+					</span>
+				</div>
+			</div>
+
+			<!-- Fee Summary Cards -->
+			<div class="row g-4 mb-4">
+				<div class="col-lg-3 col-md-6">
+					<div class="fee-card fee-card-primary">
+						<div class="fee-card-icon">
+							<i class="fas fa-receipt"></i>
+						</div>
+						<div class="fee-card-content">
+							<h6 class="fee-card-label">Total Fees Due</h6>
+							<h3 class="fee-card-amount">₹{{ total_fees_due }}</h3>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6">
+					<div class="fee-card fee-card-success">
+						<div class="fee-card-icon">
+							<i class="fas fa-check-circle"></i>
+						</div>
+						<div class="fee-card-content">
+							<h6 class="fee-card-label">Amount Paid</h6>
+							<h3 class="fee-card-amount">₹{{ paid_fees }}</h3>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6">
+					<div class="fee-card fee-card-{% if pending_amount > 0 %}danger{% else %}success{% endif %}">
+						<div class="fee-card-icon">
+							<i class="fas fa-{% if pending_amount > 0 %}exclamation-triangle{% else %}check-circle{% endif %}"></i>
+						</div>
+						<div class="fee-card-content">
+							<h6 class="fee-card-label">Pending Amount</h6>
+							<h3 class="fee-card-amount">₹{{ pending_amount }}</h3>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6">
+					<div class="fee-card fee-card-{% if pending_amount <= 0 %}success{% else %}warning{% endif %}">
+						<div class="fee-card-icon">
+							<i class="fas fa-{% if pending_amount <= 0 %}shield-alt{% else %}clock{% endif %}"></i>
+						</div>
+						<div class="fee-card-content">
+							<h6 class="fee-card-label">Payment Status</h6>
+							<div class="fee-card-status">
+								{% if pending_amount <= 0 %}
+								<span class="status-badge status-success">Fully Paid</span>
+								{% else %}
+								<span class="status-badge status-warning">Pending</span>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Fee Structure Info -->
+			{% if fee_structure %}
+			<div class="fee-info-card mb-4">
+				<div class="fee-info-header">
+					<i class="fas fa-info-circle me-2"></i>
+					<span>Fee Structure Details</span>
+				</div>
+				<div class="fee-info-content">
+					<div class="row g-3">
+						<div class="col-md-4">
+							<strong>Department:</strong> {{ fee_structure.department }}
+						</div>
+						<div class="col-md-4">
+							<strong>Academic Year:</strong> {{ fee_structure.academic_year }}
+						</div>
+						<div class="col-md-4">
+							<strong>Due Date:</strong> 
+							{% if fee_structure.due_date %}
+								{{ fee_structure.due_date }}
+							{% else %}
+								Not specified
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+	</div>
+
+	<!-- Attendance Status -->
+	<div class="row mb-4">
+		<div class="col-12">
+			<div class="attendance-card">
+				<div class="attendance-header">
+					<div class="attendance-icon">
+						<i class="fas fa-calendar-check"></i>
+					</div>
+					<div class="attendance-title">
+						<h5 class="mb-1">Attendance Status</h5>
+						<p class="mb-0 text-muted">Current attendance percentage</p>
+					</div>
+					<div class="attendance-percentage">
+						<div class="percentage-circle {% if attendance_pct >= 75 %}success{% else %}danger{% endif %}">
+							<span class="percentage-text">{{ "%.1f"|format(attendance_pct) }}%</span>
+						</div>
+					</div>
+				</div>
+				<div class="attendance-content">
+					{% if attendance_pct < 75 %}
+					<div class="attendance-warning">
+						<div class="warning-icon">
+							<i class="fas fa-exclamation-triangle"></i>
+						</div>
+						<div class="warning-content">
+							<h6 class="mb-2">Attendance Fine Required!</h6>
+							<p class="mb-2">Your attendance is below 75%. Fine amount: <strong class="text-danger">₹{{ fine_amount }}</strong></p>
+							<small class="text-muted">₹1000 per percentage point below 75%</small>
+						</div>
+					</div>
+					{% else %}
+					<div class="attendance-success">
+						<div class="success-icon">
+							<i class="fas fa-check-circle"></i>
+						</div>
+						<div class="success-content">
+							<h6 class="mb-2 text-success">Excellent Attendance!</h6>
+							<p class="mb-0 text-muted">You're maintaining good attendance. No fine required.</p>
+						</div>
+					</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Payment Forms -->
+	<div class="row g-4 mb-4">
+		<div class="col-lg-6">
+			<div class="payment-card payment-card-primary">
+				<div class="payment-header">
+					<div class="payment-icon">
+						<i class="fas fa-credit-card"></i>
+					</div>
+					<div class="payment-title">
+						<h5 class="mb-1">Regular Fees Payment</h5>
+						<p class="mb-0 text-muted">Pay your academic fees</p>
+					</div>
+				</div>
+				<div class="payment-content">
+					{% if pending_amount > 0 %}
+					<form method="post" class="payment-form">
+						<input type="hidden" name="payment_type" value="fees">
+						<div class="form-group">
+							<label class="form-label">Amount to Pay</label>
+							<div class="input-group">
+								<span class="input-group-text">₹</span>
+								<input type="number" class="form-control" step="0.01" name="amount" 
+									placeholder="Enter amount" min="1" max="{{ pending_amount }}" required>
+							</div>
+							<small class="form-text">Maximum: ₹{{ pending_amount }}</small>
+						</div>
+						<button type="submit" class="btn btn-payment btn-primary w-100">
+							<i class="fas fa-credit-card me-2"></i>Pay Fees
+						</button>
+					</form>
+					{% else %}
+					<div class="payment-success">
+						<div class="success-icon-large">
+							<i class="fas fa-check-circle"></i>
+						</div>
+						<h6 class="text-success">All Fees Paid!</h6>
+						<p class="text-muted">You're all caught up with your payments.</p>
+					</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-6">
+			<div class="payment-card payment-card-warning">
+				<div class="payment-header">
+					<div class="payment-icon">
+						<i class="fas fa-exclamation-triangle"></i>
+					</div>
+					<div class="payment-title">
+						<h5 class="mb-1">Attendance Fine</h5>
+						<p class="mb-0 text-muted">Pay attendance penalty</p>
+					</div>
+				</div>
+				<div class="payment-content">
+					{% if fine_amount > 0 %}
+					<form method="post" class="payment-form">
+						<input type="hidden" name="payment_type" value="attendance_fine">
+						<input type="hidden" name="amount" value="{{ fine_amount }}">
+						<div class="form-group">
+							<label class="form-label">Fine Amount</label>
+							<div class="input-group">
+								<span class="input-group-text">₹</span>
+								<input type="text" class="form-control" value="{{ fine_amount }}" readonly>
+							</div>
+							<small class="form-text">Calculated based on attendance shortage</small>
+						</div>
+						<button type="submit" class="btn btn-payment btn-warning w-100">
+							<i class="fas fa-exclamation-triangle me-2"></i>Pay Fine
+						</button>
+					</form>
+					{% else %}
+					<div class="payment-success">
+						<div class="success-icon-large">
+							<i class="fas fa-check-circle"></i>
+						</div>
+						<h6 class="text-success">No Fine Required!</h6>
+						<p class="text-muted">Your attendance is above 75%.</p>
+					</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Payment History -->
+	<div class="row">
+		<div class="col-12">
+			<div class="history-card">
+				<div class="history-header">
+					<div class="history-title">
+						<h5 class="mb-1">Payment History</h5>
+						<p class="mb-0 text-muted">Track all your payment transactions</p>
+					</div>
+					<div class="history-icon">
+						<i class="fas fa-history"></i>
+					</div>
+				</div>
+				<div class="history-content">
+					{% if payments %}
+					<div class="payment-list">
+						{% for p in payments %}
+						<div class="payment-item">
+							<div class="payment-item-icon">
+								{% if p.payment_type == "fees" %}
+								<i class="fas fa-graduation-cap"></i>
+								{% else %}
+								<i class="fas fa-exclamation-triangle"></i>
+								{% endif %}
+							</div>
+							<div class="payment-item-details">
+								<div class="payment-item-header">
+									<h6 class="mb-1">{{ p.receipt_number }}</h6>
+									<span class="payment-type-badge {% if p.payment_type == 'fees' %}badge-primary{% else %}badge-warning{% endif %}">
+										{% if p.payment_type == "fees" %}Regular Fees{% else %}Attendance Fine{% endif %}
+									</span>
+								</div>
+								<div class="payment-item-info">
+									<span class="amount">₹{{ p.amount }}</span>
+									<span class="date">{{ p.created_at.strftime('%d %b %Y') }}</span>
+									<span class="status-badge {% if p.status == 'success' %}status-success{% else %}status-danger{% endif %}">
+										{{ p.status.title() }}
+									</span>
+								</div>
+							</div>
+							<div class="payment-item-actions">
+								{% if p.status == "success" %}
+								<a href="/download_receipt/{{ p.id }}" class="btn btn-sm btn-outline-primary me-2">
+									<i class="fas fa-download me-1"></i>Download
+								</a>
+								<button onclick="printReceipt({{ p.id }})" class="btn btn-sm btn-outline-secondary">
+									<i class="fas fa-print me-1"></i>Print
+								</button>
+								{% endif %}
+							</div>
+						</div>
+						{% endfor %}
+					</div>
+					{% else %}
+					<div class="empty-state">
+						<div class="empty-icon">
+							<i class="fas fa-receipt"></i>
+						</div>
+						<h6 class="text-muted">No payments yet</h6>
+						<p class="text-muted">Your payment history will appear here once you make a payment.</p>
+					</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+function printReceipt(paymentId) {
+	// Open receipt in new window for printing
+	const receiptWindow = window.open(`/download_receipt/${paymentId}`, '_blank');
+	receiptWindow.onload = function() {
+		receiptWindow.print();
+	};
+}
+</script>
+{% endblock %}

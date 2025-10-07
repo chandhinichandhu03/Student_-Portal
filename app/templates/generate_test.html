@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Back Button -->
+<div class="mb-3">
+	<a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">
+		<i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+	</a>
+</div>
+
+<h2 class="h4 mb-3">Generate Test (AI)</h2>
+<form method="post" class="card shadow p-4">
+	<div class="row g-3">
+		<div class="col-md-4"><label class="form-label">Topic</label><input class="form-control" name="topic" required></div>
+		<div class="col-md-3"><label class="form-label">Number of Questions</label><input type="number" class="form-control" name="num_questions" value="5" min="1" max="50"></div>
+		<div class="col-md-3"><label class="form-label">Time Limit (min)</label><input type="number" class="form-control" name="time_limit" value="0" min="0"></div>
+		<div class="col-md-2"><label class="form-label">Department</label><input class="form-control" name="department"></div>
+	</div>
+	<button class="btn btn-primary mt-3">Generate</button>
+</form>
+{% endblock %}

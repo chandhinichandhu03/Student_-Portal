@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Back Button -->
+<div class="mb-3">
+	<a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">
+		<i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+	</a>
+</div>
+
+<h2 class="h4 mb-3">Leave Applications</h2>
+<div class="card shadow-sm">
+	<div class="card-body">
+		<table class="table">
+			<thead><tr><th>Student</th><th>Dates</th><th>Status</th><th>Reason</th></tr></thead>
+			<tbody>
+			{% for l in leaves %}
+			<tr>
+				<td>{{ l.user.name }}</td>
+				<td>{{ l.from_date }} → {{ l.to_date }}</td>
+				<td>
+					{% if l.status == 'pending' %}<span class="badge bg-warning">pending</span>
+					{% elif l.status == 'approved' %}<span class="badge bg-success">approved</span>
+					{% else %}<span class="badge bg-danger">rejected</span>{% endif %}
+				</td>
+				<td>
+					<div>{{ l.reason }}</div>
+					{# Intentionally hide AI summary from admin as requested #}
+				</td>
+				
+			</tr>
+			{% else %}
+			<tr><td colspan="5">No leave requests.</td></tr>
+			{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+{% endblock %}

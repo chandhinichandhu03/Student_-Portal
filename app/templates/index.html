@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row">
+	<div class="col-lg-10 mx-auto">
+		<section class="hero-card">
+			<div class="hero-content">
+				<h1 class="hero-title">Welcome to <span>Student Portal</span></h1>
+				<p class="hero-subtitle">Modern edtech experience with AI-powered tests, analytics, attendance, and more.</p>
+				<div class="hero-actions">
+					<a class="btn btn-primary btn-lg" href="/login"><i class="fas fa-sign-in-alt me-2"></i>Login</a>
+					<a class="btn btn-outline-secondary btn-lg ms-2" href="/register"><i class="fas fa-user-plus me-2"></i>Register</a>
+				</div>
+			</div>
+			<div class="hero-visual">
+				<div class="blob"></div>
+				<div class="blob second"></div>
+				<div class="shine"></div>
+			</div>
+		</section>
+
+
+	</div>
+</div>
+<style>
+.hero-card {
+	position: relative;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	border-radius: 28px;
+	padding: 64px 48px;
+	color: #fff;
+	box-shadow: 0 30px 80px rgba(102, 126, 234, 0.35);
+	overflow: hidden;
+}
+.hero-content { position: relative; z-index: 2; max-width: 680px; }
+.hero-title { font-size: 2.5rem; font-weight: 800; margin-bottom: 12px; }
+.hero-title span { text-shadow: 0 6px 24px rgba(0,0,0,.15); }
+.hero-subtitle { font-size: 1.1rem; opacity: .95; margin-bottom: 20px; }
+.hero-actions .btn { border-radius: 12px; padding: 12px 22px; }
+.hero-visual { position: absolute; right: -60px; top: -60px; width: 520px; height: 520px; }
+.blob { position: absolute; width: 380px; height: 380px; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.35), rgba(255,255,255,0)); border-radius: 40% 60% 60% 40% / 40% 40% 60% 60%; filter: blur(10px); animation: blobMove 12s ease-in-out infinite; }
+.blob.second { left: 120px; top: 160px; width: 300px; height: 300px; opacity: .6; animation-delay: -3s; }
+.shine { position: absolute; inset: 0; background: radial-gradient(circle at 60% 10%, rgba(255,255,255,.25), transparent 40%); mix-blend-mode: screen; }
+@keyframes blobMove { 0%,100%{ transform: translate(0,0) rotate(0deg);} 50%{ transform: translate(-20px, 10px) rotate(20deg);} }
+
+.features-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 16px; }
+.feature-item { background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 8px 24px rgba(2,6,23,.08); border: 1px solid rgba(0,0,0,.05); transition: transform .2s ease, box-shadow .2s ease; }
+.feature-item:hover { transform: translateY(-4px); box-shadow: 0 14px 34px rgba(2,6,23,.12); }
+.feature-icon { width: 48px; height: 48px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; color: #fff; margin-bottom: 12px; box-shadow: 0 6px 16px rgba(2,6,23,.15); }
+.feature-item h5 { margin: 0 0 6px 0; font-weight: 700; color: #1e293b; }
+.feature-item p { margin: 0; color: #64748b; font-size: .95rem; }
+
+@media (max-width: 768px) {
+	.hero-card { padding: 40px 24px; }
+	.hero-title { font-size: 2rem; }
+	.hero-visual { display: none; }
+}
+</style>
+{% endblock %}

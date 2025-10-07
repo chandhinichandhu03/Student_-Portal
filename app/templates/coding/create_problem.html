@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <!-- Back Button -->
+    <div class="mb-3">
+        <a href="{{ url_for('coding.admin_coding_problems') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Manage Problems
+        </a>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-plus-circle me-2"></i>
+                        Create Coding Problem
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label for="title" class="form-label fw-semibold">Problem Title</label>
+                                    <input type="text" class="form-control" id="title" name="title" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="difficulty" class="form-label fw-semibold">Difficulty</label>
+                                    <select class="form-select" id="difficulty" name="difficulty" required>
+                                        <option value="easy">Easy</option>
+                                        <option value="medium" selected>Medium</option>
+                                        <option value="hard">Hard</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="category" class="form-label fw-semibold">Category</label>
+                                    <select class="form-select" id="category" name="category" required>
+                                        <option value="algorithms">Algorithms</option>
+                                        <option value="data-structures">Data Structures</option>
+                                        <option value="mathematics">Mathematics</option>
+                                        <option value="strings">Strings</option>
+                                        <option value="arrays">Arrays</option>
+                                        <option value="dynamic-programming">Dynamic Programming</option>
+                                        <option value="graph">Graph</option>
+                                        <option value="tree">Tree</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="time_limit" class="form-label fw-semibold">Time Limit (seconds)</label>
+                                    <input type="number" class="form-control" id="time_limit" name="time_limit" value="5" min="1" max="30">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="memory_limit" class="form-label fw-semibold">Memory Limit (MB)</label>
+                                    <input type="number" class="form-control" id="memory_limit" name="memory_limit" value="128" min="64" max="512">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label fw-semibold">Problem Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="8" required 
+                                      placeholder="Describe the problem, provide examples, and explain the expected input/output format..."></textarea>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h5 class="fw-bold mb-3">
+                                <i class="fas fa-vial me-2"></i>
+                                Test Cases
+                            </h5>
+                            
+                            <div id="testCases">
+                                <div class="test-case mb-3">
+                                    <div class="card border">
+                                        <div class="card-header bg-light">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="fw-semibold">Test Case 1</span>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeTestCase(this)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-5">
+                                                    <label class="form-label">Input</label>
+                                                    <textarea class="form-control" name="test_case_input" rows="3" required></textarea>
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <label class="form-label">Expected Output</label>
+                                                    <textarea class="form-control" name="test_case_output" rows="3" required></textarea>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label class="form-label">Points</label>
+                                                    <input type="number" class="form-control" name="test_case_points" value="10" min="1" max="100">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button type="button" class="btn btn-outline-primary" onclick="addTestCase()">
+                                <i class="fas fa-plus me-2"></i>Add Test Case
+                            </button>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('coding.admin_coding_problems') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Create Problem
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let testCaseCount = 1;
+
+function addTestCase() {
+    testCaseCount++;
+    const testCasesDiv = document.getElementById('testCases');
+    const newTestCase = document.createElement('div');
+    newTestCase.className = 'test-case mb-3';
+    newTestCase.innerHTML = `
+        <div class="card border">
+            <div class="card-header bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-semibold">Test Case ${testCaseCount}</span>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeTestCase(this)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-5">
+                        <label class="form-label">Input</label>
+                        <textarea class="form-control" name="test_case_input" rows="3" required></textarea>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label">Expected Output</label>
+                        <textarea class="form-control" name="test_case_output" rows="3" required></textarea>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Points</label>
+                        <input type="number" class="form-control" name="test_case_points" value="10" min="1" max="100">
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    testCasesDiv.appendChild(newTestCase);
+}
+
+function removeTestCase(button) {
+    const testCase = button.closest('.test-case');
+    testCase.remove();
+    
+    // Renumber remaining test cases
+    const testCases = document.querySelectorAll('.test-case');
+    testCases.forEach((tc, index) => {
+        const header = tc.querySelector('.card-header span');
+        header.textContent = `Test Case ${index + 1}`;
+    });
+    testCaseCount = testCases.length;
+}
+</script>
+{% endblock %}

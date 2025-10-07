@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-12">
+			<!-- Back Button -->
+			<div class="mb-3">
+				<a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">
+					<i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+				</a>
+			</div>
+			
+			<div class="d-flex justify-content-between align-items-center mb-4">
+				<div>
+					<h1 class="h3 mb-1 text-gradient">💰 Fee Structure Management</h1>
+					<p class="text-muted mb-0">Configure fee structures by department and semester</p>
+				</div>
+				<div class="text-end">
+					<span class="badge bg-primary fs-6 px-3 py-2">
+						<i class="fas fa-user-shield me-2"></i>Admin Panel
+					</span>
+				</div>
+			</div>
+
+			<!-- Add Fee Structure Form -->
+			<div class="fee-form-card mb-4">
+				<div class="fee-form-header">
+					<div class="fee-form-icon">
+						<i class="fas fa-plus-circle"></i>
+					</div>
+					<div class="fee-form-title">
+						<h5 class="mb-1">Add/Update Fee Structure</h5>
+						<p class="mb-0 text-muted">Set fee amounts for departments and semesters</p>
+					</div>
+				</div>
+				<div class="fee-form-content">
+					<form method="post" class="fee-form">
+						<div class="row g-3">
+							<div class="col-md-3">
+								<div class="form-group">
+									<label class="form-label">Department</label>
+									<select class="form-control" name="department" required>
+										<option value="">Select Department</option>
+										<option value="Computer Science">Computer Science</option>
+										<option value="Electronics">Electronics</option>
+										<option value="Mechanical">Mechanical</option>
+										<option value="Civil">Civil</option>
+										<option value="Electrical">Electrical</option>
+										<option value="Information Technology">Information Technology</option>
+										<option value="AIML">Artificial Intelligence & Machine Learning</option>
+										<option value="AIDS">Artificial Intelligence & Data Science</option>
+										<option value="IoT">Internet of Things</option>
+										<option value="Aeronautical">Aeronautical Engineering</option>
+										<option value="Biomedical">Biomedical Engineering</option>
+										<option value="AIoT">Artificial Intelligence of Things</option>
+										<option value="Food Technology">Food Technology</option>
+										<option value="Mechatronics">Mechatronics</option>
+										<option value="Automobile">Automobile Engineering</option>
+										<option value="Chemical">Chemical Engineering</option>
+										<option value="Biotechnology">Biotechnology</option>
+										<option value="Aerospace">Aerospace Engineering</option>
+										<option value="Robotics">Robotics Engineering</option>
+										<option value="Cyber Security">Cyber Security</option>
+										<option value="Cloud Computing">Cloud Computing</option>
+										<option value="Blockchain">Blockchain Technology</option>
+									</select>
+								</div>
+							</div>
+							<div class="col-md-2">
+								<div class="form-group">
+									<label class="form-label">Semester</label>
+									<select class="form-control" name="semester" required>
+										<option value="">Select</option>
+										<option value="1st">1st Semester</option>
+										<option value="2nd">2nd Semester</option>
+										<option value="3rd">3rd Semester</option>
+										<option value="4th">4th Semester</option>
+										<option value="5th">5th Semester</option>
+										<option value="6th">6th Semester</option>
+										<option value="7th">7th Semester</option>
+										<option value="8th">8th Semester</option>
+									</select>
+								</div>
+							</div>
+							<div class="col-md-2">
+								<div class="form-group">
+									<label class="form-label">Total Fees (₹)</label>
+									<input type="number" class="form-control" name="total_fees" 
+										placeholder="50000" step="0.01" min="0" required>
+								</div>
+							</div>
+							<div class="col-md-2">
+								<div class="form-group">
+									<label class="form-label">Due Date</label>
+									<input type="date" class="form-control" name="due_date">
+								</div>
+							</div>
+							<div class="col-md-2">
+								<div class="form-group">
+									<label class="form-label">Academic Year</label>
+									<input type="text" class="form-control" name="academic_year" 
+										value="2024-25" placeholder="2024-25">
+								</div>
+							</div>
+							<div class="col-md-1">
+								<div class="form-group">
+									<label class="form-label">&nbsp;</label>
+									<button type="submit" class="btn btn-primary w-100">
+										<i class="fas fa-save"></i>
+									</button>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+
+			<!-- Fee Structures List -->
+			<div class="fee-structures-card">
+				<div class="fee-structures-header">
+					<div class="fee-structures-title">
+						<h5 class="mb-1">Current Fee Structures</h5>
+						<p class="mb-0 text-muted">Manage existing fee configurations</p>
+					</div>
+					<div class="fee-structures-icon">
+						<i class="fas fa-list-alt"></i>
+					</div>
+				</div>
+				<div class="fee-structures-content">
+					{% if structures %}
+					<div class="fee-structures-list">
+						{% for structure in structures %}
+						<div class="fee-structure-item">
+							<div class="fee-structure-icon">
+								<i class="fas fa-graduation-cap"></i>
+							</div>
+							<div class="fee-structure-details">
+								<div class="fee-structure-header">
+									<h6 class="mb-1">{{ structure.department }}</h6>
+									<span class="fee-structure-badge badge-primary">
+										{{ structure.semester }} Semester
+									</span>
+								</div>
+								<div class="fee-structure-info">
+									<div class="fee-amount">
+										<span class="amount-label">Total Fees:</span>
+										<span class="amount-value">₹{{ structure.total_fees }}</span>
+									</div>
+									<div class="fee-meta">
+										<span class="academic-year">{{ structure.academic_year }}</span>
+										{% if structure.due_date %}
+										<span class="due-date">Due: {{ structure.due_date }}</span>
+										{% endif %}
+									</div>
+								</div>
+							</div>
+							<div class="fee-structure-actions">
+								<span class="fee-status-badge status-active">Active</span>
+							</div>
+						</div>
+						{% endfor %}
+					</div>
+					{% else %}
+					<div class="empty-state">
+						<div class="empty-icon">
+							<i class="fas fa-receipt"></i>
+						</div>
+						<h6 class="text-muted">No fee structures configured</h6>
+						<p class="text-muted">Add fee structures using the form above to get started.</p>
+					</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

@@ -1,0 +1,776 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-12">
+			<!-- Back Button -->
+			<div class="mb-3">
+				<a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">
+					<i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+				</a>
+			</div>
+			
+			<div class="d-flex justify-content-between align-items-center mb-4">
+				<div>
+					<h1 class="h3 mb-1 text-gradient">👤 Edit Profile</h1>
+					<p class="text-muted mb-0">Update your personal information and preferences</p>
+				</div>
+				<div class="text-end">
+					<span class="badge bg-primary fs-6 px-3 py-2">
+						<i class="fas fa-user me-2"></i>{{ current_user.role.title() }}
+					</span>
+				</div>
+			</div>
+
+			<div class="row g-4">
+				<!-- Profile Picture & Basic Info -->
+				<div class="col-lg-4">
+					<div class="profile-card gradient">
+						<div class="profile-header">
+							<div class="profile-avatar">
+								<div class="avatar-circle">
+									<i class="fas fa-user"></i>
+								</div>
+								<div class="avatar-actions">
+									<label class="btn btn-sm btn-outline-primary mb-0">
+										<i class="fas fa-camera me-1"></i>Change Photo
+										<input type="file" name="avatar" accept="image/*" class="d-none" onchange="this.form.submit()">
+									</label>
+								</div>
+							</div>
+							<div class="profile-info">
+								<h4 class="profile-name">{{ current_user.name }}</h4>
+								<p class="profile-role">{{ current_user.role.title() }}</p>
+								<div class="profile-meta">
+									<div class="meta-item">
+										<i class="fas fa-envelope me-2"></i>
+										<span>{{ current_user.email }}</span>
+									</div>
+									<div class="meta-item">
+										<i class="fas fa-building me-2"></i>
+										<span>{{ current_user.department }}</span>
+									</div>
+									{% if profile.linkedin_url %}
+									<div class="meta-item">
+										<i class="fab fa-linkedin me-2"></i>
+										<a href="{{ profile.linkedin_url }}" target="_blank" class="text-decoration-none">LinkedIn Profile</a>
+									</div>
+									{% endif %}
+								</div>
+							</div>
+						</div>
+						<div class="profile-stats">
+							<div class="stat-item">
+								<div class="stat-value">{{ current_user.results|length if current_user.results else 0 }}</div>
+								<div class="stat-label">Tests Taken</div>
+							</div>
+							<div class="stat-item">
+								<div class="stat-value">
+									{% if current_user.results %}
+										{{ "%.1f"|format((current_user.results|map(attribute='marks')|sum / current_user.results|map(attribute='total')|sum * 100)) }}%
+									{% else %}
+										0%
+									{% endif %}
+								</div>
+								<div class="stat-label">Avg Score</div>
+							</div>
+							{% if profile.cgpa %}
+							<div class="stat-item">
+								<div class="stat-value">{{ "%.2f"|format(profile.cgpa) }}</div>
+								<div class="stat-label">CGPA</div>
+							</div>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+
+				<!-- Edit Form -->
+				<div class="col-lg-8">
+					<form method="post" class="profile-form">
+						<!-- Basic Information -->
+						<div class="profile-form-card mb-4">
+							<div class="profile-form-header">
+								<div class="form-header-icon">
+									<i class="fas fa-user"></i>
+								</div>
+								<div class="form-header-content">
+									<h5 class="mb-1">Basic Information</h5>
+									<p class="mb-0 text-muted">Your personal details</p>
+								</div>
+							</div>
+							<div class="profile-form-content">
+								<div class="row g-3">
+									<div class="col-md-6">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-user me-2"></i>Full Name *
+											</label>
+											<input type="text" class="form-control" name="name" 
+												value="{{ current_user.name }}" required>
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-building me-2"></i>Department *
+											</label>
+											<select class="form-control" name="department" required>
+												<option value="">Select Department</option>
+												<option value="Computer Science" {% if current_user.department == 'Computer Science' %}selected{% endif %}>Computer Science</option>
+												<option value="Electronics" {% if current_user.department == 'Electronics' %}selected{% endif %}>Electronics</option>
+												<option value="Mechanical" {% if current_user.department == 'Mechanical' %}selected{% endif %}>Mechanical</option>
+												<option value="Civil" {% if current_user.department == 'Civil' %}selected{% endif %}>Civil</option>
+												<option value="Electrical" {% if current_user.department == 'Electrical' %}selected{% endif %}>Electrical</option>
+												<option value="Information Technology" {% if current_user.department == 'Information Technology' %}selected{% endif %}>Information Technology</option>
+												<option value="AIML" {% if current_user.department == 'AIML' %}selected{% endif %}>Artificial Intelligence & Machine Learning</option>
+												<option value="AIDS" {% if current_user.department == 'AIDS' %}selected{% endif %}>Artificial Intelligence & Data Science</option>
+												<option value="IoT" {% if current_user.department == 'IoT' %}selected{% endif %}>Internet of Things</option>
+												<option value="Aeronautical" {% if current_user.department == 'Aeronautical' %}selected{% endif %}>Aeronautical Engineering</option>
+												<option value="Biomedical" {% if current_user.department == 'Biomedical' %}selected{% endif %}>Biomedical Engineering</option>
+												<option value="AIoT" {% if current_user.department == 'AIoT' %}selected{% endif %}>Artificial Intelligence of Things</option>
+												<option value="Food Technology" {% if current_user.department == 'Food Technology' %}selected{% endif %}>Food Technology</option>
+												<option value="Mechatronics" {% if current_user.department == 'Mechatronics' %}selected{% endif %}>Mechatronics</option>
+												<option value="Automobile" {% if current_user.department == 'Automobile' %}selected{% endif %}>Automobile Engineering</option>
+												<option value="Chemical" {% if current_user.department == 'Chemical' %}selected{% endif %}>Chemical Engineering</option>
+												<option value="Biotechnology" {% if current_user.department == 'Biotechnology' %}selected{% endif %}>Biotechnology</option>
+												<option value="Aerospace" {% if current_user.department == 'Aerospace' %}selected{% endif %}>Aerospace Engineering</option>
+												<option value="Robotics" {% if current_user.department == 'Robotics' %}selected{% endif %}>Robotics Engineering</option>
+												<option value="Cyber Security" {% if current_user.department == 'Cyber Security' %}selected{% endif %}>Cyber Security</option>
+												<option value="Cloud Computing" {% if current_user.department == 'Cloud Computing' %}selected{% endif %}>Cloud Computing</option>
+												<option value="Blockchain" {% if current_user.department == 'Blockchain' %}selected{% endif %}>Blockchain Technology</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-calendar me-2"></i>Date of Birth
+											</label>
+											<input type="date" class="form-control" name="date_of_birth" 
+												value="{{ profile.date_of_birth.strftime('%Y-%m-%d') if profile.date_of_birth else '' }}">
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-venus-mars me-2"></i>Gender
+											</label>
+											<select class="form-control" name="gender">
+												<option value="">Select Gender</option>
+												<option value="Male" {% if profile.gender == 'Male' %}selected{% endif %}>Male</option>
+												<option value="Female" {% if profile.gender == 'Female' %}selected{% endif %}>Female</option>
+												<option value="Other" {% if profile.gender == 'Other' %}selected{% endif %}>Other</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-tint me-2"></i>Blood Group
+											</label>
+											<select class="form-control" name="blood_group">
+												<option value="">Select Blood Group</option>
+												<option value="A+" {% if profile.blood_group == 'A+' %}selected{% endif %}>A+</option>
+												<option value="A-" {% if profile.blood_group == 'A-' %}selected{% endif %}>A-</option>
+												<option value="B+" {% if profile.blood_group == 'B+' %}selected{% endif %}>B+</option>
+												<option value="B-" {% if profile.blood_group == 'B-' %}selected{% endif %}>B-</option>
+												<option value="AB+" {% if profile.blood_group == 'AB+' %}selected{% endif %}>AB+</option>
+												<option value="AB-" {% if profile.blood_group == 'AB-' %}selected{% endif %}>AB-</option>
+												<option value="O+" {% if profile.blood_group == 'O+' %}selected{% endif %}>O+</option>
+												<option value="O-" {% if profile.blood_group == 'O-' %}selected{% endif %}>O-</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-phone me-2"></i>Phone Number
+											</label>
+											<input type="tel" class="form-control" name="phone" 
+												value="{{ profile.phone or '' }}" placeholder="+91 98765 43210">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Academic Information -->
+						<div class="profile-form-card mb-4">
+							<div class="profile-form-header">
+								<div class="form-header-icon">
+									<i class="fas fa-graduation-cap"></i>
+								</div>
+								<div class="form-header-content">
+									<h5 class="mb-1">Academic Information</h5>
+									<p class="mb-0 text-muted">Your academic details</p>
+								</div>
+							</div>
+							<div class="profile-form-content">
+								<div class="row g-3">
+									<div class="col-md-6">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-calendar-alt me-2"></i>Year of Study
+											</label>
+											<select class="form-control" name="year_of_study">
+												<option value="">Select Year</option>
+												<option value="1st Year" {% if profile.year_of_study == '1st Year' %}selected{% endif %}>1st Year</option>
+												<option value="2nd Year" {% if profile.year_of_study == '2nd Year' %}selected{% endif %}>2nd Year</option>
+												<option value="3rd Year" {% if profile.year_of_study == '3rd Year' %}selected{% endif %}>3rd Year</option>
+												<option value="4th Year" {% if profile.year_of_study == '4th Year' %}selected{% endif %}>4th Year</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-book me-2"></i>Semester
+											</label>
+											<select class="form-control" name="semester">
+												<option value="">Select Semester</option>
+												<option value="1st Sem" {% if profile.semester == '1st Sem' %}selected{% endif %}>1st Semester</option>
+												<option value="2nd Sem" {% if profile.semester == '2nd Sem' %}selected{% endif %}>2nd Semester</option>
+												<option value="3rd Sem" {% if profile.semester == '3rd Sem' %}selected{% endif %}>3rd Semester</option>
+												<option value="4th Sem" {% if profile.semester == '4th Sem' %}selected{% endif %}>4th Semester</option>
+												<option value="5th Sem" {% if profile.semester == '5th Sem' %}selected{% endif %}>5th Semester</option>
+												<option value="6th Sem" {% if profile.semester == '6th Sem' %}selected{% endif %}>6th Semester</option>
+												<option value="7th Sem" {% if profile.semester == '7th Sem' %}selected{% endif %}>7th Semester</option>
+												<option value="8th Sem" {% if profile.semester == '8th Sem' %}selected{% endif %}>8th Semester</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-chart-line me-2"></i>CGPA
+											</label>
+											<input type="number" class="form-control" name="cgpa" 
+												value="{{ profile.cgpa or '' }}" step="0.01" min="0" max="10" placeholder="8.5">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Professional Information -->
+						<div class="profile-form-card mb-4">
+							<div class="profile-form-header">
+								<div class="form-header-icon">
+									<i class="fas fa-briefcase"></i>
+								</div>
+								<div class="form-header-content">
+									<h5 class="mb-1">Professional Information</h5>
+									<p class="mb-0 text-muted">Your professional profiles and links</p>
+								</div>
+							</div>
+							<div class="profile-form-content">
+								<div class="row g-3">
+									<div class="col-md-6">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fab fa-linkedin me-2"></i>LinkedIn URL
+											</label>
+											<input type="url" class="form-control" name="linkedin_url" 
+												value="{{ profile.linkedin_url or '' }}" placeholder="https://linkedin.com/in/yourprofile">
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fab fa-github me-2"></i>GitHub URL
+											</label>
+											<input type="url" class="form-control" name="github_url" 
+												value="{{ profile.github_url or '' }}" placeholder="https://github.com/yourusername">
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-globe me-2"></i>Portfolio URL
+											</label>
+											<input type="url" class="form-control" name="portfolio_url" 
+												value="{{ profile.portfolio_url or '' }}" placeholder="https://yourportfolio.com">
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-file-pdf me-2"></i>Resume URL
+											</label>
+											<input type="url" class="form-control" name="resume_url" 
+												value="{{ profile.resume_url or '' }}" placeholder="https://yourresume.com">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Skills and Certifications -->
+						<div class="profile-form-card mb-4">
+							<div class="profile-form-header">
+								<div class="form-header-icon">
+									<i class="fas fa-certificate"></i>
+								</div>
+								<div class="form-header-content">
+									<h5 class="mb-1">Skills & Certifications</h5>
+									<p class="mb-0 text-muted">Your technical skills and certifications</p>
+								</div>
+							</div>
+							<div class="profile-form-content">
+								<div class="row g-3">
+									<div class="col-12">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-code me-2"></i>Skills
+											</label>
+											<input type="text" class="form-control" name="skills" 
+												value="{% if profile.skills %}{{ profile.skills|from_json|join(', ') }}{% endif %}" 
+												placeholder="Python, JavaScript, React, Node.js (comma separated)">
+											<small class="form-text text-muted">Separate multiple skills with commas</small>
+										</div>
+									</div>
+									<div class="col-12">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-award me-2"></i>Certifications
+											</label>
+											<input type="text" class="form-control" name="certifications" 
+												value="{% if profile.certifications %}{{ profile.certifications|from_json|join(', ') }}{% endif %}" 
+												placeholder="AWS Certified Developer, Google Cloud Professional (comma separated)">
+											<small class="form-text text-muted">Separate multiple certifications with commas</small>
+										</div>
+									</div>
+									<div class="col-12">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-heart me-2"></i>Interests
+											</label>
+											<input type="text" class="form-control" name="interests" 
+												value="{% if profile.interests %}{{ profile.interests|from_json|join(', ') }}{% endif %}" 
+												placeholder="Machine Learning, Web Development, Data Science (comma separated)">
+											<small class="form-text text-muted">Separate multiple interests with commas</small>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Contact & Emergency Information -->
+						<div class="profile-form-card mb-4">
+							<div class="profile-form-header">
+								<div class="form-header-icon">
+									<i class="fas fa-address-book"></i>
+								</div>
+								<div class="form-header-content">
+									<h5 class="mb-1">Contact & Emergency Information</h5>
+									<p class="mb-0 text-muted">Your contact details and emergency contacts</p>
+								</div>
+							</div>
+							<div class="profile-form-content">
+								<div class="row g-3">
+									<div class="col-12">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-map-marker-alt me-2"></i>Address
+											</label>
+											<textarea class="form-control" rows="3" name="address" 
+												placeholder="Your complete address">{{ profile.address or '' }}</textarea>
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-user-friends me-2"></i>Emergency Contact Name
+											</label>
+											<input type="text" class="form-control" name="emergency_contact_name" 
+												value="{{ profile.emergency_contact_name or '' }}" placeholder="Parent/Guardian Name">
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-phone-alt me-2"></i>Emergency Contact Number
+											</label>
+											<input type="tel" class="form-control" name="emergency_contact" 
+												value="{{ profile.emergency_contact or '' }}" placeholder="+91 98765 43210">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Social Media -->
+						<div class="profile-form-card mb-4">
+							<div class="profile-form-header">
+								<div class="form-header-icon">
+									<i class="fas fa-share-alt"></i>
+								</div>
+								<div class="form-header-content">
+									<h5 class="mb-1">Social Media</h5>
+									<p class="mb-0 text-muted">Your social media profiles</p>
+								</div>
+							</div>
+							<div class="profile-form-content">
+								<div class="row g-3">
+									<div class="col-md-6">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fab fa-twitter me-2"></i>Twitter URL
+											</label>
+											<input type="url" class="form-control" name="twitter_url" 
+												value="{{ profile.twitter_url or '' }}" placeholder="https://twitter.com/yourusername">
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fab fa-instagram me-2"></i>Instagram URL
+											</label>
+											<input type="url" class="form-control" name="instagram_url" 
+												value="{{ profile.instagram_url or '' }}" placeholder="https://instagram.com/yourusername">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- About & Notes -->
+						<div class="profile-form-card mb-4">
+							<div class="profile-form-header">
+								<div class="form-header-icon">
+									<i class="fas fa-info-circle"></i>
+								</div>
+								<div class="form-header-content">
+									<h5 class="mb-1">About & Notes</h5>
+									<p class="mb-0 text-muted">Additional information about yourself</p>
+								</div>
+							</div>
+							<div class="profile-form-content">
+								<div class="row g-3">
+									<div class="col-12">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-user-circle me-2"></i>Bio
+											</label>
+											<textarea class="form-control" rows="4" name="bio" 
+												placeholder="Tell us about yourself, your goals, and interests...">{{ profile.bio or '' }}</textarea>
+										</div>
+									</div>
+									<div class="col-12">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-sticky-note me-2"></i>Additional Notes
+											</label>
+											<textarea class="form-control" rows="3" name="notes" 
+												placeholder="Any additional information you'd like to share...">{{ profile.notes or '' }}</textarea>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Form Actions -->
+						<div class="profile-form-card">
+							<div class="profile-form-content">
+								<div class="form-actions">
+									<button type="submit" class="btn btn-primary btn-lg">
+										<i class="fas fa-save me-2"></i>Save Changes
+									</button>
+									<button type="button" class="btn btn-outline-secondary btn-lg" onclick="window.history.back()">
+										<i class="fas fa-times me-2"></i>Cancel
+									</button>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+
+			<!-- Security Settings -->
+			<div class="row g-4 mt-4">
+				<div class="col-12">
+					<div class="security-card">
+						<div class="security-header">
+							<div class="security-icon">
+								<i class="fas fa-shield-alt"></i>
+							</div>
+							<div class="security-content">
+								<h5 class="mb-1">Security Settings</h5>
+								<p class="mb-0 text-muted">Manage your account security</p>
+							</div>
+						</div>
+						<div class="security-actions">
+							<button class="btn btn-outline-warning">
+								<i class="fas fa-key me-2"></i>Change Password
+							</button>
+							<button id="enrollFaceBtn" class="btn btn-outline-info">
+								<i class="fas fa-user-check me-2"></i>Enroll Face Lock
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+// Simple face embedding placeholder using canvas; replace with real ML embedding in production
+async function captureEmbedding() {
+	if (!navigator.mediaDevices?.getUserMedia) throw new Error('Camera not supported');
+	const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+	const video = document.createElement('video');
+	video.srcObject = stream; await video.play();
+	const canvas = document.createElement('canvas');
+	canvas.width = 160; canvas.height = 120; const ctx = canvas.getContext('2d');
+	ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+	stream.getTracks().forEach(t=>t.stop());
+	// Derive a naive embedding: downsample pixels to vector (placeholder!)
+	const img = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+	const emb = [];
+	for (let i=0; i<img.length; i+=16) emb.push((img[i]+img[i+1]+img[i+2])/3/255);
+	return emb.slice(0,512);
+}
+
+document.getElementById('enrollFaceBtn')?.addEventListener('click', async ()=>{
+	try {
+		const embedding = await captureEmbedding();
+		const res = await fetch('/face/enroll', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ embedding }) });
+		const data = await res.json();
+		if (data.ok) alert('Face lock enrolled for your account.'); else alert(data.error||'Failed to enroll');
+	} catch (e) { console.error(e); alert('Unable to access camera or process face.'); }
+});
+</script>
+
+<style>
+.profile-card {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	border-radius: 20px;
+	padding: 2rem;
+	color: white;
+	box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.profile-header {
+	text-align: center;
+	margin-bottom: 2rem;
+}
+
+.avatar-circle {
+	width: 100px;
+	height: 100px;
+	border-radius: 50%;
+	background: rgba(255,255,255,0.2);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 2.5rem;
+	margin: 0 auto 1rem;
+	border: 3px solid rgba(255,255,255,0.3);
+}
+
+.avatar-actions {
+	margin-top: 1rem;
+}
+
+.profile-name {
+	font-size: 1.5rem;
+	font-weight: 600;
+	margin-bottom: 0.5rem;
+}
+
+.profile-role {
+	opacity: 0.8;
+	margin-bottom: 1rem;
+}
+
+.profile-meta {
+	text-align: left;
+}
+
+.meta-item {
+	display: flex;
+	align-items: center;
+	margin-bottom: 0.5rem;
+	font-size: 0.9rem;
+}
+
+.profile-stats {
+	display: flex;
+	justify-content: space-around;
+	background: rgba(255,255,255,0.1);
+	border-radius: 15px;
+	padding: 1.5rem;
+	margin-top: 1rem;
+}
+
+.stat-item {
+	text-align: center;
+}
+
+.stat-value {
+	font-size: 1.5rem;
+	font-weight: 700;
+	margin-bottom: 0.25rem;
+}
+
+.stat-label {
+	font-size: 0.8rem;
+	opacity: 0.8;
+}
+
+.profile-form-card {
+	background: white;
+	border-radius: 20px;
+	box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+	overflow: hidden;
+	margin-bottom: 1.5rem;
+}
+
+.profile-form-header {
+	background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+	color: white;
+	padding: 1.5rem;
+	display: flex;
+	align-items: center;
+}
+
+.form-header-icon {
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	background: rgba(255,255,255,0.2);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1.2rem;
+	margin-right: 1rem;
+}
+
+.form-header-content h5 {
+	margin: 0;
+	font-weight: 600;
+}
+
+.profile-form-content {
+	padding: 2rem;
+}
+
+.form-section {
+	margin-bottom: 2rem;
+}
+
+.section-title {
+	color: #6c757d;
+	font-weight: 600;
+	margin-bottom: 1rem;
+	padding-bottom: 0.5rem;
+	border-bottom: 2px solid #e9ecef;
+}
+
+.form-group {
+	margin-bottom: 1.5rem;
+}
+
+.form-label {
+	font-weight: 600;
+	color: #495057;
+	margin-bottom: 0.5rem;
+	display: block;
+}
+
+.form-control {
+	border: 2px solid #e9ecef;
+	border-radius: 10px;
+	padding: 0.75rem 1rem;
+	font-size: 0.95rem;
+	transition: all 0.3s ease;
+}
+
+.form-control:focus {
+	border-color: #667eea;
+	box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.form-text {
+	font-size: 0.8rem;
+	margin-top: 0.25rem;
+}
+
+.form-actions {
+	display: flex;
+	gap: 1rem;
+	justify-content: center;
+	padding-top: 1rem;
+	border-top: 1px solid #e9ecef;
+}
+
+.btn {
+	border-radius: 10px;
+	padding: 0.75rem 2rem;
+	font-weight: 600;
+	transition: all 0.3s ease;
+}
+
+.btn-primary {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	border: none;
+}
+
+.btn-primary:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+.security-card {
+	background: white;
+	border-radius: 20px;
+	box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+	padding: 2rem;
+}
+
+.security-header {
+	display: flex;
+	align-items: center;
+	margin-bottom: 1.5rem;
+}
+
+.security-icon {
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1.2rem;
+	color: #d63384;
+	margin-right: 1rem;
+}
+
+.security-content h5 {
+	margin: 0;
+	font-weight: 600;
+	color: #495057;
+}
+
+.security-actions {
+	display: flex;
+	gap: 1rem;
+}
+
+@media (max-width: 768px) {
+	.profile-stats {
+		flex-direction: column;
+		gap: 1rem;
+	}
+	
+	.form-actions {
+		flex-direction: column;
+	}
+	
+	.security-actions {
+		flex-direction: column;
+	}
+}
+</style>
+{% endblock %}
