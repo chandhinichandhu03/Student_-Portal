@@ -93,3 +93,13 @@ GEMINI_API_KEY=<your-gemini-api-key>
 DEFAULT_ADMIN_EMAIL=admin@example.com
 DEFAULT_ADMIN_PASSWORD=Admin@123
 ```
+
+
+run code in terminal
+
+py -m venv venv
+.\venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+
+
+.\venv\Scripts\python.exe wsgi.py
